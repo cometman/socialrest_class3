@@ -45,6 +45,18 @@ border-top-left-radius: 10px;
 	border-bottom: none;
 }
 
+#myCabs
+{
+border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	font-size: 22px;
+	padding: 13px 10px 0px 10px;
+	float:left;
+	border-style: solid;
+	border-bottom: none;
+}
+
+
 #content
 {
 	border-bottom-right-radius: 10px;
@@ -70,7 +82,28 @@ border-top-left-radius: 10px;
 
 #startRideContent
 {
+	font-size: medium;
 	top: 200px;
 	visibility: hidden;
 	position: fixed;
+}
+
+#datepicker
+{
+	background-color: green;
+	border-radius: 10px;
+
+}
+
+#welcome
+{
+	min-height: 380px;
+	min-width: 33%;
+	max-width: 33%;
+	margin-left: 34%;
+	margin-top: 42px;
+	padding: 10px 10px 10px 10px;
+	overflow: auto;
+	max-height: 380px;
+	font-size: large;
 }

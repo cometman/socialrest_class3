@@ -11,8 +11,8 @@
 		<button id="logoutButton" onclick="logout()">Logout</button>
 </header>
 <body>
-<div id="fb-root"></div>
 
+<div id="fb-root"></div>
 	<script>		  
 		var nextPage;
 		var previousPage;
@@ -20,6 +20,7 @@
 		var validUser;
 		var isLoaded = false;
 		var loadedFriends = false;
+		var invitedFriends = new Array();
 		// Facebook Init function
 		window.fbAsyncInit = function() {
 			FB.init({
@@ -128,25 +129,58 @@
 			 	}
 			 });
 		}
+
+		function createNewRide()
+		{
+			FB.api('/me/events', 'post', {name:"Test from JS", start_time:"2013-01-27T14:06Z"}, function (response){
+				if (!response || response.error)
+				{
+					console.log("Somethign went wrong!", response);
+				}
+				else {
+					invitedFriends[0] = "CabstrBeta";
+					inviteUsers(invitedFriends, response.id);
+				}
+			});
+		}
+
+		function inviteUsers(invitees, eventID)
+		{
+			for (i = 0; i < invitees.length; i++)
+			{
+				FB.api('/'+eventID+'/' + invitees[i], 'post', function(response){
+					if (!response || response.error)
+					{
+						alert("invites success!");
+					}
+				});
+			}			
+		}
 	
 	</script>
+<!-- Ride Navigation Bar -->
 	<div id="rideNavBar">
 		<div id="findRide" onclick="findARide()">Find a Ride</div>
 		<div id="startRide" onclick="startNewRide()">Start a Ride</div>
+		<div id="myCabs" onclick="startNewRide()">My Cabs</div>
 	</div>
 
 	<div id="content">
 		<div id="findRideContent">
 		</div>
 		<div id="startRideContent">
-			<h2>Where you headed?</h1>
+			<h2>1.  Where you headed?</h1>
 			<select>	
 				<option value="airport">Airport</option>
 				<option value="geekdom">Geekdom</option>
 				<option value="lulu">LuLu's</option>
 				<option value="mall">Mall</option>
 			</select>
-			<p>Date: <input type="text" id="datepicker" /></p>
+			<h2>2.  When you need a cab?</h2>
+			<input type="text" id="datepicker" value="Select Date"/>
+
+			<h2>3. Make my Cabstr! </h2>
+			<button onclick="createNewRide()">Let's go!</button>
 			<script>
 			$(function() {
 			    $( "#datepicker" ).datepicker();
@@ -156,7 +190,7 @@
 
 	</div>
 
-	<!-- None social Scripts to run -->
+<!-- None social Scripts to run -->
 	<script>
 
 		function findARide()

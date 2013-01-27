@@ -10,7 +10,7 @@
 
 		<section id="loginSection">
 			<button onclick="login()">Login with Facebook</button>
-			<button>Login with Twitter</button>
+			<!-- <button>Login with Twitter</button> -->
 		</section>
 
 		<div id="fb-root"></div>
@@ -46,7 +46,7 @@
 			        } else {
 			            // cancelled
 			        }
-			    });
+			    }, {scope: 'create_event'});
 			}
 
 			function logout() {
@@ -59,8 +59,8 @@
 
 		</script>
 
-		<div id="content">
-		
+		<div id="welcome">
+		Welcome to Cabstr.  Start by logging in with Facebook and let's find you a cab!
 
 		</div>
 
