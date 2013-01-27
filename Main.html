@@ -1,0 +1,195 @@
+<html>
+<head>
+		<link rel="stylesheet" type="text/css" href="assets/style.css">
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="assets/waitForKeyElements.js"></script>
+		<script src="assets/js/jquery-ui-1.10.0.custom.js"></script>
+		<link rel="stylesheet" type="text/css" href="assets/css/smoothness/jquery-ui-1.10.0.custom.css">
+</head>
+<header>
+		<div id="userProfile"></div>
+		<button id="logoutButton" onclick="logout()">Logout</button>
+</header>
+<body>
+<div id="fb-root"></div>
+
+	<script>		  
+		var nextPage;
+		var previousPage;
+		var dispName = "test";
+		var validUser;
+		var isLoaded = false;
+		var loadedFriends = false;
+		// Facebook Init function
+		window.fbAsyncInit = function() {
+			FB.init({
+			appId      : '507961805914774', // App ID
+			status     : true, // check login status
+			cookie     : true, // enable cookies to allow the server to access the session
+			xfbml      : true  // parse XFBML
+			});
+
+			// Make sure the Facebook SDK loads...Anonymous inner function is needed in order to make setTimeout() work.
+			setTimeout(function(){buildUserNavPanel()}, 500);
+
+		};
+
+		// Load the SDK Asynchronously
+		(function(d){
+			var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+			if (d.getElementById(id)) {return;}
+			js = d.createElement('script'); js.id = id; js.async = true;
+			js.src = "//connect.facebook.net/en_US/all.js";
+			ref.parentNode.insertBefore(js, ref);
+		}(document));
+
+		function retrieveFriends() {
+			if (!loadedFriends)
+			{
+				loadedFriends = true;
+				FB.api('/me/friends?limit=10', function(response){
+					if (response && response.data){
+					// Handle response
+						addFriendsToDiv(response.data);
+						console.log(response.data.length);
+					// Set the paging URLs
+						if (response.paging)
+						{
+							if (response.paging.next)
+								nextPage = response.paging.next;
+							if (response.paging.previous)
+								previousPage = response.paging.previous;
+						}
+					} else {
+						console.log('Something goes wrong', response);
+					}
+				});
+			}
+		}
+
+		function displayPage(page){
+			FB.api(page, function(response)
+			{
+				if (response && response.data)
+				{
+					addFriendsToDiv(response.data);
+					// Set the paging URLs
+					if (response.paging)
+					{
+						if (response.paging.next)
+							nextPage = response.paging.next;
+						if (response.paging.previous)
+							previousPage = response.paging.previous;
+					}					
+				} else {
+					console.log("Somethign went wrong", response);
+				}			
+			});
+		}
+
+		function logout() {
+				FB.logout(function(response) {
+
+				});
+				window.location = "LoginPage.html";
+		}
+
+		function addFriendsToDiv(data) {
+			for (i=0; i< data.length; i++)
+			{
+				getFriendNameWithPicture(data[i].id, data[i].name);
+			}
+
+		}
+
+		function getFriendNameWithPicture(id, name) {
+			FB.api('/'+id+'/picture', function(response){
+				if (response && response.data){
+					var content = document.getElementById("findRideContent");
+					content.innerHTML = content.innerHTML + "<img src=" + response.data.url + ">";
+					content.innerHTML = content.innerHTML + name + " <br/>";					
+				} else {
+					console.log('Something goes wrong', response);
+				}
+			});
+		}
+
+		function buildUserNavPanel()
+		{
+			 FB.api('/me/picture', function(response)
+			 {
+			 	if (response && response.data)
+			 	{
+			 		var content = document.getElementById("userProfile");
+			 		content.innerHTML = content.innerHTML + "<img src="+response.data.url+">";
+			 	}
+			 	else {
+			 		console.log("Somethign went wrong!", response);
+			 	}
+			 });
+		}
+	
+	</script>
+	<div id="rideNavBar">
+		<div id="findRide" onclick="findARide()">Find a Ride</div>
+		<div id="startRide" onclick="startNewRide()">Start a Ride</div>
+	</div>
+
+	<div id="content">
+		<div id="findRideContent">
+		</div>
+		<div id="startRideContent">
+			<h2>Where you headed?</h1>
+			<select>	
+				<option value="airport">Airport</option>
+				<option value="geekdom">Geekdom</option>
+				<option value="lulu">LuLu's</option>
+				<option value="mall">Mall</option>
+			</select>
+			<p>Date: <input type="text" id="datepicker" /></p>
+			<script>
+			$(function() {
+			    $( "#datepicker" ).datepicker();
+			  });
+			</script>
+		</div>
+
+	</div>
+
+	<!-- None social Scripts to run -->
+	<script>
+
+		function findARide()
+		{
+			document.getElementById("startRideContent").style.visibility = "hidden";
+			document.getElementById("findRideContent").style.visibility = "visible";
+			document.getElementById("content").style.overflow = "auto";
+			retrieveFriends();	
+		}
+		function startNewRide()
+		{
+			document.getElementById("findRideContent").style.visibility = "hidden";
+			document.getElementById("startRideContent").style.visibility = "visible";
+			document.getElementById("content").style.overflow = "hidden";
+			
+		}
+			// Detect scroll bar touch
+		$('#content').scroll(function(){
+			if (isScrollBottom())
+			{
+				displayPage(nextPage);
+			}
+		});
+
+		function isScrollBottom() { 
+			var contentDiv = document.getElementById("content");
+			if (contentDiv.offsetHeight + contentDiv.scrollTop >= contentDiv.scrollHeight)
+			{
+				return true;
+			}
+		}
+
+
+	</script>
+</body>
+</html>
