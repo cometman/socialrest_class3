@@ -148,6 +148,7 @@
 		    return false;
 		});
 
+		// Updated
 		$('#invite-event').click(function() {
 		    FB.api('/EVENT_ID/invited?users=USER_ID1,USER_ID2,USER_ID3','post',function(resp) {
 		        console.log(resp); // should return true
