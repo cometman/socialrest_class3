@@ -11,8 +11,8 @@
 		<button id="logoutButton" onclick="logout()">Logout</button>
 </header>
 <body>
-
 <div id="fb-root"></div>
+
 	<script>		  
 		var nextPage;
 		var previousPage;
@@ -20,11 +20,10 @@
 		var validUser;
 		var isLoaded = false;
 		var loadedFriends = false;
-		var invitedFriends = new Array();
 		// Facebook Init function
 		window.fbAsyncInit = function() {
 			FB.init({
-			appId      : '507961805914774', // App ID
+			appId      : '467241193324372', // App ID
 			status     : true, // check login status
 			cookie     : true, // enable cookies to allow the server to access the session
 			xfbml      : true  // parse XFBML
@@ -44,49 +43,9 @@
 			ref.parentNode.insertBefore(js, ref);
 		}(document));
 
-		function retrieveFriends() {
-			if (!loadedFriends)
-			{
-				loadedFriends = true;
-				FB.api('/me/friends?limit=10', function(response){
-					if (response && response.data){
-					// Handle response
-						addFriendsToDiv(response.data);
-						console.log(response.data.length);
-					// Set the paging URLs
-						if (response.paging)
-						{
-							if (response.paging.next)
-								nextPage = response.paging.next;
-							if (response.paging.previous)
-								previousPage = response.paging.previous;
-						}
-					} else {
-						console.log('Something goes wrong', response);
-					}
-				});
-			}
-		}
+		
 
-		function displayPage(page){
-			FB.api(page, function(response)
-			{
-				if (response && response.data)
-				{
-					addFriendsToDiv(response.data);
-					// Set the paging URLs
-					if (response.paging)
-					{
-						if (response.paging.next)
-							nextPage = response.paging.next;
-						if (response.paging.previous)
-							previousPage = response.paging.previous;
-					}					
-				} else {
-					console.log("Somethign went wrong", response);
-				}			
-			});
-		}
+		
 
 		function logout() {
 				FB.logout(function(response) {
@@ -95,25 +54,7 @@
 				window.location = "LoginPage.html";
 		}
 
-		function addFriendsToDiv(data) {
-			for (i=0; i< data.length; i++)
-			{
-				getFriendNameWithPicture(data[i].id, data[i].name);
-			}
-
-		}
-
-		function getFriendNameWithPicture(id, name) {
-			FB.api('/'+id+'/picture', function(response){
-				if (response && response.data){
-					var content = document.getElementById("findRideContent");
-					content.innerHTML = content.innerHTML + "<img src=" + response.data.url + ">";
-					content.innerHTML = content.innerHTML + name + " <br/>";					
-				} else {
-					console.log('Something goes wrong', response);
-				}
-			});
-		}
+		
 
 		function buildUserNavPanel()
 		{
@@ -129,100 +70,37 @@
 			 	}
 			 });
 		}
-
-		function createNewRide()
-		{
-			FB.api('/me/events', 'post', {name:"Test from JS", start_time:"2013-01-27T14:06Z"}, function (response){
-				if (!response || response.error)
-				{
-					console.log("Somethign went wrong!", response);
-				}
-				else {
-					invitedFriends[0] = "CabstrBeta";
-					inviteUsers(invitedFriends, response.id);
-				}
-			});
-		}
-
-		function inviteUsers(invitees, eventID)
-		{
-			for (i = 0; i < invitees.length; i++)
-			{
-				FB.api('/'+eventID+'/' + invitees[i], 'post', function(response){
-					if (!response || response.error)
-					{
-						alert("invites success!");
-					}
-				});
-			}			
-		}
 	
 	</script>
-<!-- Ride Navigation Bar -->
 	<div id="rideNavBar">
-		<div id="findRide" onclick="findARide()">Find a Ride</div>
-		<div id="startRide" onclick="startNewRide()">Start a Ride</div>
-		<div id="myCabs" onclick="startNewRide()">My Cabs</div>
+		<div id="browseRides" onclick="findARide()">Browse Rides...</div>
+		<div id="startRide" onclick="startNewRide()">Create New Ride</div>
 	</div>
 
 	<div id="content">
-		<div id="findRideContent">
-		</div>
 		<div id="startRideContent">
-			<h2>1.  Where you headed?</h1>
-			<select>	
-				<option value="airport">Airport</option>
-				<option value="geekdom">Geekdom</option>
-				<option value="lulu">LuLu's</option>
-				<option value="mall">Mall</option>
-			</select>
-			<h2>2.  When you need a cab?</h2>
-			<input type="text" id="datepicker" value="Select Date"/>
-
-			<h2>3. Make my Cabstr! </h2>
-			<button onclick="createNewRide()">Let's go!</button>
-			<script>
-			$(function() {
-			    $( "#datepicker" ).datepicker();
-			  });
-			</script>
+			<iframe id="starRideIframe" class="starRideIframe" src="StartRide.html" frameBorder="0"></iframe>
+		</div>
+		<div id="friendContainer">
 		</div>
 
 	</div>
 
-<!-- None social Scripts to run -->
+	<!-- None social Scripts to run -->
 	<script>
 
-		function findARide()
-		{
-			document.getElementById("startRideContent").style.visibility = "hidden";
-			document.getElementById("findRideContent").style.visibility = "visible";
-			document.getElementById("content").style.overflow = "auto";
-			retrieveFriends();	
-		}
+
 		function startNewRide()
 		{
-			document.getElementById("findRideContent").style.visibility = "hidden";
+
+			document.getElementById("friendContainer").style.visibility = "hidden";
 			document.getElementById("startRideContent").style.visibility = "visible";
-			document.getElementById("content").style.overflow = "hidden";
+			document.getElementById("content").style.overflow = "auto";
+	
+
 			
 		}
-			// Detect scroll bar touch
-		$('#content').scroll(function(){
-			if (isScrollBottom())
-			{
-				displayPage(nextPage);
-			}
-		});
-
-		function isScrollBottom() { 
-			var contentDiv = document.getElementById("content");
-			if (contentDiv.offsetHeight + contentDiv.scrollTop >= contentDiv.scrollHeight)
-			{
-				return true;
-			}
-		}
-
+		
 
 	</script>
 </body>
